@@ -4,56 +4,13 @@
 
     *   By default, Django signals are executed synchronously. This means that the signal handlers run in the same request/response cycle as the signal sender. 
     *   Here's a code snippet to illustrate this:
-
-        @receiver(post_save, sender=User)
-        def send_welcome_email(sender, instance, created, **kwargs):
-            try:
-                with transaction.atomic():
-                    print(f"Signal handler called in thread: {threading.current_thread().name}")
-                    if created:
-                        send_mail(
-                            'Welcome to Our Platform',
-                            'Thank you for signing up!',
-                            settings.EMAIL_HOST_USER,
-                            [instance.email],
-                            fail_silently=False,
-                        )
-                return Response(status=status.HTTP_200_OK)
-            except Exception as e:
-                return Response({'Error':str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    *   ![Screenshot (18)](https://github.com/user-attachments/assets/4fcb023c-481b-4960-b3dc-33f513afef17)
 
 *   Question 2: Thread Execution:
     *   Yes, Django signals run in the same thread as the caller.
     *   Here’s a snippet to demonstrate that:
-        (View code snippet)
-        try:
-            with transaction.atomic():
-                serializer = UserSerializer(data=request.data)
-                if serializer.is_valid():
-                    serializer.save()
-                    print(f"View running in thread: {threading.current_thread().name}")
-                    return Response(serializer.data, status=status.HTTP_201_CREATED)
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({'error':str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        (signal code snippet)
-        try:
-            with transaction.atomic():
-                print(f"Signal handler called in thread: {threading.current_thread().name}")
-                if created:
-                    send_mail(
-                        'Welcome to Our Platform',
-                        'Thank you for signing up!',
-                        settings.EMAIL_HOST_USER,
-                        [instance.email],
-                        fail_silently=False,
-                    )
-            return Response(status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({'Error':str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    *   ![Screenshot (18)](https://github.com/user-attachments/assets/4fcb023c-481b-4960-b3dc-33f513afef17)
+    *   ![Screenshot (19)](https://github.com/user-attachments/assets/e6b8ad89-7e12-45d7-be4c-032c9c15deb1)
 
 *   Question 3: Database Transactions:
     *   By default, Django signals run in the same database transaction as the caller. This means that if the transaction is rolled back, the signal handlers are also rolled back( by using transaction atomic()).
